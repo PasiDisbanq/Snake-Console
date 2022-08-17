@@ -5,8 +5,10 @@
 #include <utility>
 using namespace std::chrono;
 
-//fruity w wezu
-//moze teleport od scianki
+//fruits inside snake
+//more fruits
+
+//wall teleport in 2.0 (bad code here)
 
 std::vector<std::pair<int, int>> allPos;
 
@@ -176,6 +178,43 @@ inline void AfterFruit(const char& here)
         MoveCursor(allPos[allPos.size()-1].first-1, allPos[allPos.size()-1].second);
 }
 
+void FruitCheck(Fruit* fruitt)
+{
+    if(currentX == fruitt->posX && currentY == fruitt->posY)
+    {
+        if(allPos.size()>1)
+        {
+            AfterFruit(lastdir);
+            std::cout << '@';
+
+            helpdir = lastdir;
+            draw = true;
+
+            allPos.push_back(std::make_pair(allPos[allPos.size() - 1].first, allPos[allPos.size() - 1].second));
+        }
+        else
+        {
+            if(dir == 'l')
+                MoveCursor(allPos[0].first+1, allPos[0].second);
+            else if(dir == 'r')
+                MoveCursor(allPos[0].first-1, allPos[0].second);
+            else if(dir == 'u')
+                MoveCursor(allPos[0].first, allPos[0].second+1);
+            else
+                MoveCursor(allPos[0].first, allPos[0].second-1);
+
+            std::cout << '@';
+
+            draw = true;
+            helpdir = dir;
+
+            allPos.push_back(std::make_pair(allPos[0].first, allPos[0].second));
+        }
+
+        fruitt->Spawn();
+    }
+}
+
 int main()
 {
     std::srand(time(nullptr));
@@ -186,6 +225,8 @@ int main()
 
     Fruit* fruit = new Fruit();
     fruit->Spawn();
+    Fruit* fruit2 = new Fruit();
+    fruit2->Spawn();
 
     auto start = high_resolution_clock::now();
     while(true)
@@ -211,40 +252,9 @@ int main()
                 AfterFruit(helpdir);
                 std::cout << ' ';
             }
-
-            if(currentX == fruit->posX && currentY == fruit->posY)
-            {
-                if(allPos.size()>1)
-                {
-                    AfterFruit(lastdir);
-                    std::cout << '@';
-
-                    helpdir = lastdir;
-                    draw = true;
-
-                    allPos.push_back(std::make_pair(allPos[allPos.size() - 1].first, allPos[allPos.size() - 1].second));
-                }
-                else
-                {
-                    if(dir == 'l')
-                        MoveCursor(allPos[0].first+1, allPos[0].second);
-                    else if(dir == 'r')
-                        MoveCursor(allPos[0].first-1, allPos[0].second);
-                    else if(dir == 'u')
-                        MoveCursor(allPos[0].first, allPos[0].second+1);
-                    else
-                        MoveCursor(allPos[0].first, allPos[0].second-1);
-
-                    std::cout << '@';
-
-                    draw = true;
-                    helpdir = dir;
-
-                    allPos.push_back(std::make_pair(allPos[0].first, allPos[0].second));
-                }
-
-                fruit->Spawn();
-            }
+            
+            FruitCheck(fruit);
+            FruitCheck(fruit2);
 
             MoveCursor(0,11);
             std::cout << "Score: " << allPos.size();
